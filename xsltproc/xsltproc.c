@@ -16,7 +16,8 @@ int main(int argc, char **argv) {
 	xslt = xsltParseStylesheetFile((const xmlChar *)argv[1]);
 
 	xmlDocPtr xml_in, xml_out;
-	xml_in = xmlParseFile(argv[2]);
+	//xml_in = xmlParseFile(argv[2]);
+	xml_in = xmlReadFile(argv[2], "utf-8", XML_PARSE_COMPACT|XML_PARSE_HUGE);
 	xml_out = xsltApplyStylesheet(xslt, xml_in, NULL);
 
 	xsltSaveResultToFile(stdout, xml_out, xslt);
