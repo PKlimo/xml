@@ -78,13 +78,13 @@ xmlSAXHandler make_sax_handler (){
 }
 
 static void OnStartElementNs(void *ctx,const xmlChar *localname,const xmlChar *prefix,const xmlChar *URI,int nb_namespaces,const xmlChar **namespaces,int nb_attributes,int nb_defaulted,const xmlChar **attributes) {
-    UNUSED(prefix); UNUSED(URI); UNUSED(nb_namespaces); UNUSED(namespaces); UNUSED(nb_attributes); UNUSED(nb_defaulted); UNUSED(attributes);
+    UNUSED(prefix); UNUSED(URI); UNUSED(nb_namespaces); UNUSED(namespaces); UNUSED(nb_attributes); UNUSED(nb_defaulted); UNUSED(attributes); UNUSED(ctx);
     if (strcmp((const char*)localname, el) == 0) {
-        xmlParserCtxt *pok;
-        pok = ctx;
-        printf("[DEBUG] %s %i:%i\n", localname, xmlSAX2GetLineNumber(ctx), xmlSAX2GetColumnNumber(ctx));
-        printf("[DEBUG] %p of %p, diff: %i\n", pok->input->cur, pok->input->base, (pok->input->cur - pok->input->base));
-        printf("[DEBUG] position: %lu\n", position);
+        // xmlParserCtxt *pok;
+        // pok = ctx;
+        // printf("[DEBUG] %s %i:%i\n", localname, xmlSAX2GetLineNumber(ctx), xmlSAX2GetColumnNumber(ctx));
+        // printf("[DEBUG] %p of %p, diff: %i\n", pok->input->cur, pok->input->base, (pok->input->cur - pok->input->base));
+        // printf("[DEBUG] position: %lu\n", position);
 
         position++;
         p = 1;
@@ -103,5 +103,6 @@ static void OnCharacters(void *ctx, const xmlChar *ch, int len) {
     strncpy(chars, (const char *)ch, len);
     chars[len] = '\0';
     if (p == 1)
+        // printf("%.*s\n", 11, chars+4);  // envelopesequence
         printf("%s\n", chars);
 }
