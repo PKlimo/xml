@@ -14,7 +14,8 @@ $(PRG_NAME): $(SRC_NAME)
 	$(CC) $(CFLAGS) $(LIBS) -lxslt $(SRC_NAME) -o $(PRG_NAME)
 
 run: $(PRG_NAME)
-	./$(PRG_NAME) tst_1M.xml letter
+	./$(PRG_NAME) test.xslt tst_1M.xml letter
+	./$(PRG_NAME) cdcatalog.xslt cdcatalog.xml cd
 
 clean:
 	rm -f $(PRG_NAME)
