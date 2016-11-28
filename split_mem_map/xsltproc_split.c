@@ -62,6 +62,8 @@ int read_xmlfile(char *xsltname, char *fname, char *el) {
                 xml_out = xsltApplyStylesheet(xslt, xml_in, NULL);
                 xsltSaveResultToFile(stdout, xml_out, xslt);
                 beg_part = NULL;
+                xmlFreeDoc(xml_out);
+                xmlFreeDoc(xml_in);
             }
         }
     }
