@@ -8,7 +8,17 @@
 
 extern int xmlLoadExtDtdDefaultValue;
 
+struct element {
+    char *el_beg;  // contains pointer to string "<el>"
+    char *el_end;  // contains pointer to string "</el>"
+    size_t el_beg_len;  // length of string
+    size_t el_end_len;  // length of string
+};
+
 int read_xmlfile(char *xslt, char *fname, char *el);
+void create_element(char *el, struct element *e);
+void free_element(struct element e);
+
 
 int main(int argc, char *argv[]) {
     if (argc != 4){
@@ -21,44 +31,35 @@ int main(int argc, char *argv[]) {
 }
 
 int read_xmlfile(char *xsltname, char *fname, char *el) {
-    xmlDocPtr xml_in, xml_out;
-    const char *beg_part=NULL;
-    const char *end_part=NULL;
-
-    char *el_beg = (char *)malloc(strlen(el)+3);
-    strcpy(el_beg,"<");
-    strcat(strcat(el_beg, el), ">");
-
-    char *el_end = (char *)malloc(strlen(el)+4);
-    strcpy(el_end,"</");
-    strcat(strcat(el_end, el), ">");
-
-    size_t el_beg_len = strlen(el_beg);
-    size_t el_end_len = strlen(el_end);
-
     int fd = open (fname, O_RDWR);
-
     struct stat sb;
-    fstat (fd, &sb);
+    fstat (fd, &sb);  // properties of file - we need only size of file, which is in sb.st_size
+    char* chars = mmap (0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);  // content of big xml file
 
-    char* chars = mmap (0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    struct element e;
+    create_element(el, &e);
 
-	xmlSubstituteEntitiesDefault(1);
-	xmlLoadExtDtdDefaultValue = 1;
+    const char *beg_part = NULL;  // pointer to beginning element in big xml (char *chars)
+    const char *end_part = NULL;  // pointer to closing element in big xml (char *chars)
+
+	xmlSubstituteEntitiesDefault(1);  // init xslt stuff
+	xmlLoadExtDtdDefaultValue = 1;  // init xslt stuff
     xsltStylesheetPtr xslt = NULL;
 	xslt = xsltParseStylesheetFile((const xmlChar *)xsltname);
+    xmlDocPtr xml_in, xml_out;
 
     for (off_t i=0; i<sb.st_size;i++){
-        if (beg_part == NULL) {
-            if (strncmp(el_beg, chars+i, el_beg_len) == 0){
+        if (beg_part == NULL) {  // we are searching for beginning element
+            if (strncmp(e.el_beg, chars+i, e.el_beg_len) == 0){
                 beg_part = chars + i;
                 //printf("%.10s\n", beg_part);
             }
-        } else {
-            if (strncmp(el_end, chars+i, el_end_len) == 0) {
+        } else {  // we have pointer that points to beginning of section, thus we are searchingg for end element
+            if (strncmp(e.el_end, chars+i, e.el_end_len) == 0) {
                 end_part = chars + i;
-                // printf("%.*s\n\n", end_part-beg_part+el_end_len, beg_part);
-                xml_in = xmlReadMemory(beg_part, end_part-beg_part+el_end_len, NULL, "utf-8", XML_PARSE_COMPACT|XML_PARSE_HUGE);
+                // printf("%.*s\n\n", end_part-beg_part+el_end_len, beg_part);  // DEBUG
+                // do xslt transformation on part from beginning element to end element
+                xml_in = xmlReadMemory(beg_part, end_part-beg_part+e.el_end_len, NULL, "utf-8", XML_PARSE_COMPACT|XML_PARSE_HUGE);
                 xml_out = xsltApplyStylesheet(xslt, xml_in, NULL);
                 xsltSaveResultToFile(stdout, xml_out, xslt);
                 beg_part = NULL;
@@ -67,14 +68,30 @@ int read_xmlfile(char *xsltname, char *fname, char *el) {
             }
         }
     }
-
     // free alocated resources
-    free(el_beg);
-    free(el_end);
+    free_element(e);
 	xsltFreeStylesheet(xslt);
     xsltCleanupGlobals();
     xmlCleanupParser();
     munmap (chars, sb.st_size);
     close(fd);
     return 0;
+}
+
+void create_element(char *el, struct element *e){
+    e->el_beg = (char *)malloc(strlen(el)+3);
+    strcpy(e->el_beg,"<");
+    strcat(strcat(e->el_beg, el), ">");
+
+    e->el_end = (char *)malloc(strlen(el)+4);
+    strcpy(e->el_end,"</");
+    strcat(strcat(e->el_end, el), ">");
+
+    e->el_beg_len = strlen(e->el_beg);
+    e->el_end_len = strlen(e->el_end);
+}
+
+void free_element(struct element e){
+    free(e.el_beg);
+    free(e.el_end);
 }
