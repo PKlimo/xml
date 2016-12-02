@@ -69,6 +69,8 @@ int read_xmlfile(char *xsltname, char *fname, char *el) {
     }
 
     // free alocated resources
+    free(el_beg);
+    free(el_end);
 	xsltFreeStylesheet(xslt);
     xsltCleanupGlobals();
     xmlCleanupParser();
