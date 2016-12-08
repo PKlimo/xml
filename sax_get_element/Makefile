@@ -5,7 +5,7 @@ CFLAGS=-std=c99 -Wall -Werror -pedantic -pedantic-errors -Wextra -Wshadow -Wpoin
         -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS += $(shell xml2-config --cflags)
 LIBS = $(shell xml2-config --libs)
-SRC_NAME = get_element.c
+SRC_NAME = sax_get_element.c
 PRG_NAME =$(SRC_NAME:.c=.exe)
 
 all: $(PRG_NAME)
