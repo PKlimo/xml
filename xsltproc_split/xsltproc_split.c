@@ -3,6 +3,7 @@
 #include <unistd.h>  // close
 #include <sys/mman.h>  // mmap, munmap
 #include <string.h>  // strcmp
+#include <stdio.h>  // sprintf
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
@@ -80,14 +81,11 @@ int read_xmlfile(char *xsltname, char *fname, char *el) {
 
 void create_element(char *el, struct element *e){
     e->el_beg = (char *)malloc(strlen(el)+3);
-    strcpy(e->el_beg,"<");
-    strcat(strcat(e->el_beg, el), ">");
+    sprintf(e->el_beg, "<%s>", el);
+    e->el_beg_len = strlen(e->el_beg);
 
     e->el_end = (char *)malloc(strlen(el)+4);
-    strcpy(e->el_end,"</");
-    strcat(strcat(e->el_end, el), ">");
-
-    e->el_beg_len = strlen(e->el_beg);
+    sprintf(e->el_end, "</%s>", el);
     e->el_end_len = strlen(e->el_end);
 }
 
