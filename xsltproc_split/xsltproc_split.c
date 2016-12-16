@@ -1,13 +1,13 @@
+#define _GNU_SOURCE
+#include <string.h>  // strcmp
+#include <stdio.h>  // asprintf
 #include <sys/stat.h>  // fstat
 #include <fcntl.h>  // open
 #include <unistd.h>  // close
 #include <sys/mman.h>  // mmap, munmap
-#include <string.h>  // strcmp
-#include <stdio.h>  // sprintf
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
-extern int xmlLoadExtDtdDefaultValue;
 
 struct element {
     char *el_beg;  // contains pointer to string "<el>"
@@ -80,12 +80,10 @@ int read_xmlfile(char *xsltname, char *fname, char *el) {
 }
 
 void create_element(char *el, struct element *e){
-    e->el_beg = (char *)malloc(strlen(el)+3);
-    sprintf(e->el_beg, "<%s>", el);
+    asprintf(&e->el_beg, "<%s>", el);
     e->el_beg_len = strlen(e->el_beg);
 
-    e->el_end = (char *)malloc(strlen(el)+4);
-    sprintf(e->el_end, "</%s>", el);
+    asprintf(&e->el_end, "</%s>", el);
     e->el_end_len = strlen(e->el_end);
 }
 
