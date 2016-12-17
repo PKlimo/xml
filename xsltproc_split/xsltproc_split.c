@@ -5,8 +5,10 @@
 #include <fcntl.h>  // open
 #include <unistd.h>  // close
 #include <sys/mman.h>  // mmap, munmap
-#include <libxslt/transform.h>
+
+extern int xmlLoadExtDtdDefaultValue;
 #include <libxslt/xsltutils.h>
+#include <libxslt/transform.h>
 
 
 struct element {
