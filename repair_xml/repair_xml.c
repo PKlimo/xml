@@ -27,7 +27,7 @@ int get_mem(char *fname, char **p, off_t *len) {
     }
 
     if (!S_ISREG (sb.st_mode)) {
-        fprintf (stderr, "%s is not a filen", fname);
+        fprintf (stderr, "%s is not a file\n", fname);
         return 1;
     }
 
